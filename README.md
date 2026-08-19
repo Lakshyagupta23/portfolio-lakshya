@@ -1,4 +1,4 @@
-# Lakshya's Cybernetic Portfolio
+# Lakshya's Portfolio
 
 A premium, engineering-focused developer portfolio featuring an interactive dashboard interface, a simulated local AI Twin chatbot assistant, and high-fidelity retro-cybernetic HUD visual aesthetics. Built with React, Vite, and Tailwind CSS.
 
