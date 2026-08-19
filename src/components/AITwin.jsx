@@ -1,6 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUp, Copy, Check, Sparkles, Bot, RefreshCw } from 'lucide-react';
+import { ArrowUp, Copy, Check, Sparkles, Bot, RefreshCw, Settings, Eye, EyeOff } from 'lucide-react';
+
+const SYSTEM_INSTRUCTION = `You are the AI Twin of Lakshya Gupta. 
+Answer questions concisely (1-2 paragraphs) in a helpful, professional developer persona.
+If asked about topics outside of your technology profile, answer in a single sentence and then gracefully bridge the conversation back to your projects or B.Tech engineering studies.
+
+Here is your profile context:
+- Name: Lakshya Gupta
+- Current Role: B.Tech student specializing in AI/ML at Inderprastha Engineering College, Ghaziabad (Expected May 2027).
+- Leadership Positions: Event Head at THINK AI student community, Social Media Lead at HackSphere.
+- Internships: AI Developer Intern at KVGAI Tech Limited (Jan 2026 - Apr 2026) where you fine-tuned and debugged Anthropic-based LLMs (Claude/Opus) and optimized prompt caching.
+- Main Projects:
+  1. SentinelFlow: Real-time DDoS detection and mitigation platform utilizing scikit-learn's Isolation Forest model and live network telemetry (Live at: https://sentinelflow-web-server.onrender.com/).
+  2. RogueDex: Pokémon randomizer and team builder web application featuring holographic design (Live at: https://rogue-dex.vercel.app/).
+  3. Mark My Face: Real-time OpenCV & Dlib face recognition attendance system created for SIH 2025.
+  4. Eventure: Verified sponsorship broker platform built with Node.js, Express, and SQL, winning 1st place at JECRC Bid2Code Hackathon.
+- Personal Interests: Nukkad Natak street plays inside Inaayat dramatics society.
+- Core Technical Skills: Python, C, C++, SQL, Machine Learning, Generative AI, Computer Vision (OpenCV), Data Structures & Algorithms.`;
 
 const LAKSHYA_BOT_PROFILE = {
   name: "Lakshya Gupta",
@@ -26,11 +43,11 @@ const LAKSHYA_BOT_PROFILE = {
 
     inaayat: `Inaayat is my creative outlet and dramatics society where I participate in street plays (Nukkad Natak). While it is a side hobby, it has been instrumental in building my public speaking, stage presence, and confidence in managing team collaboration.`,
 
-    sentinelflow: `**SentinelFlow** is a premium, real-time DDoS Detection and Mitigation Platform.
+    sentinelflow: `**SentinelFlow** is a premium, real-time DDoS Detection and Mitigation Platform (Live at: https://sentinelflow-web-server.onrender.com/).
 *   *Key Features*: Real-time traffic telemetry charts, custom alert rule builders, and automated mitigation playbooks (blocking IPs, throttling traffic).
 *   *Technical Details*: Integrates scikit-learn's Isolation Forest anomaly classification model on a FastAPI service to detect volumetric/application layer anomalies. Built on a React 19 + Tailwind CSS client, with an Express/tRPC backend connecting to MySQL/TiDB database pools via Drizzle ORM.`,
 
-    roguedex: `**RogueDex** is a high-fidelity Pokémon database, randomizer, and team builder web application designed like a polished gaming product dashboard.
+    roguedex: `**RogueDex** is a high-fidelity Pokémon database, randomizer, and team builder web application (Live at: https://rogue-dex.vercel.app/).
 *   *Key Features*: Core randomizer with animations, advanced filtering (Gens 1-9, types, legendary/mythical status), and team builder challenge rules.
 *   *Technical Details*: Built with Next.js, TypeScript, Tailwind CSS, and Framer Motion, fetching live assets and statistics dynamically from the PokeAPI.`,
 
@@ -189,6 +206,12 @@ export default function AITwin() {
   const [isTyping, setIsTyping] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
 
+  const [showSettings, setShowSettings] = useState(false);
+  const [apiKey, setApiKey] = useState(localStorage.getItem('lakshya_ai_key') || '');
+  const [apiProvider, setApiProvider] = useState(localStorage.getItem('lakshya_ai_provider') || 'gemini');
+  const [apiEnabled, setApiEnabled] = useState(localStorage.getItem('lakshya_ai_enabled') === 'true');
+  const [showApiKey, setShowApiKey] = useState(false);
+
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
 
@@ -203,7 +226,14 @@ export default function AITwin() {
     }
   }, [inputValue]);
 
-  const handleSendMessage = (text) => {
+  const saveSettings = () => {
+    localStorage.setItem('lakshya_ai_key', apiKey);
+    localStorage.setItem('lakshya_ai_provider', apiProvider);
+    localStorage.setItem('lakshya_ai_enabled', apiEnabled ? 'true' : 'false');
+    setShowSettings(false);
+  };
+
+  const handleSendMessage = async (text) => {
     if (!text.trim()) return;
 
     const userMsg = {
@@ -217,18 +247,77 @@ export default function AITwin() {
     setInputValue('');
     setIsTyping(true);
 
-    const typingDuration = Math.max(800, Math.min(1800, text.length * 12));
+    let aiText = "";
 
+    // Live LLM query route
+    if (apiEnabled && apiKey.trim()) {
+      try {
+        if (apiProvider === 'gemini') {
+          const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [
+                  {
+                    role: 'user',
+                    parts: [
+                      {
+                        text: `${SYSTEM_INSTRUCTION}\n\nUser Question: ${text.trim()}`
+                      }
+                    ]
+                  }
+                ]
+              })
+            }
+          );
+          const data = await response.json();
+          if (data.candidates && data.candidates[0].content.parts[0].text) {
+            aiText = data.candidates[0].content.parts[0].text;
+          } else {
+            throw new Error(data.error?.message || "Invalid API response from Gemini");
+          }
+        } else {
+          const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+              model: 'gpt-4o-mini',
+              messages: [
+                { role: 'system', content: SYSTEM_INSTRUCTION },
+                { role: 'user', content: text.trim() }
+              ],
+              max_tokens: 250,
+              temperature: 0.7
+            })
+          });
+          const data = await response.json();
+          if (data.choices && data.choices[0].message.content) {
+            aiText = data.choices[0].message.content;
+          } else {
+            throw new Error(data.error?.message || "Invalid API response from OpenAI");
+          }
+        }
+      } catch (err) {
+        console.warn("Live API request failed, falling back to local database:", err);
+        aiText = getLakshyaAIResponse(text);
+      }
+    } else {
+      aiText = getLakshyaAIResponse(text);
+    }
+
+    const typingDuration = Math.max(600, Math.min(1500, text.length * 10));
     setTimeout(() => {
-      const aiText = getLakshyaAIResponse(text);
-
       const aiMsg = {
         id: (Date.now() + 1).toString(),
         sender: 'ai',
         text: aiText,
         timestamp: new Date()
       };
-      
       setMessages(prev => [...prev, aiMsg]);
       setIsTyping(false);
     }, typingDuration);
@@ -269,7 +358,15 @@ export default function AITwin() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          <button 
+            onClick={() => setShowSettings(true)}
+            className="p-1.5 rounded-lg border border-white/5 bg-white/[0.02] text-text-secondary hover:text-white hover:border-white/10 transition-all cursor-pointer focus:outline-none"
+            title="AI Configuration"
+          >
+            <Settings className="w-4 h-4" />
+          </button>
+          
           {messages.length > 0 && (
             <button 
               onClick={() => setMessages([])}
@@ -402,9 +499,78 @@ export default function AITwin() {
         </div>
         <div className="mt-2 flex items-center justify-between text-[9px] text-text-tertiary font-mono">
           <span>Enter to send · Shift+Enter for new line</span>
-          <span>Offline Database Mode</span>
+          <span>{apiEnabled && apiKey.trim() ? `Active Mode (${apiProvider === 'gemini' ? 'Gemini API' : 'OpenAI API'})` : 'Offline Database Mode'}</span>
         </div>
       </div>
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm rounded-xl border border-white/10 bg-[#070b14] p-5 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-white/5 pb-2">
+              <h4 className="text-sm font-semibold text-white font-display">AI Twin Configuration</h4>
+              <button onClick={() => setShowSettings(false)} className="text-text-secondary hover:text-white text-xs">Close</button>
+            </div>
+            
+            <div className="space-y-3 text-left">
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-text-secondary font-mono">Enable Live LLM Mode</label>
+                <input 
+                  type="checkbox" 
+                  checked={apiEnabled} 
+                  onChange={(e) => setApiEnabled(e.target.checked)}
+                  className="cursor-pointer"
+                />
+              </div>
+
+              {apiEnabled && (
+                <>
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-text-tertiary font-mono uppercase tracking-wider">Select Provider</label>
+                    <select 
+                      value={apiProvider} 
+                      onChange={(e) => setApiProvider(e.target.value)}
+                      className="w-full rounded bg-white/[0.03] border border-white/10 text-white text-xs p-2 focus:outline-none"
+                    >
+                      <option value="gemini" className="bg-[#070b14]">Google Gemini (v1beta)</option>
+                      <option value="openai" className="bg-[#070b14]">OpenAI ChatGPT (gpt-4o-mini)</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[10px] text-text-tertiary font-mono uppercase tracking-wider">API Key</label>
+                    <div className="relative">
+                      <input 
+                        type={showApiKey ? "text" : "password"} 
+                        value={apiKey} 
+                        onChange={(e) => setApiKey(e.target.value)}
+                        placeholder={apiProvider === 'gemini' ? "AIzaSy..." : "sk-..."}
+                        className="w-full rounded bg-[#030712] border border-white/10 text-white text-xs p-2 pr-8 focus:outline-none font-mono"
+                      />
+                      <button 
+                        type="button"
+                        onClick={() => setShowApiKey(!showApiKey)}
+                        className="absolute right-2 top-2.5 text-text-secondary hover:text-white"
+                      >
+                        {showApiKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="flex gap-2.5 pt-2 border-t border-white/5">
+              <button 
+                onClick={saveSettings}
+                className="flex-1 rounded bg-primary text-black text-xs font-semibold py-2 hover:brightness-110 cursor-pointer"
+              >
+                Save Settings
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

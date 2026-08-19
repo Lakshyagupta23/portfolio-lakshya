@@ -36,6 +36,7 @@ const projects = [
     color: "from-red-500/20 to-rose-500/5",
     accent: "text-red-500",
     github: "https://github.com/Lakshyagupta23/RogueDex",
+    live: "https://rogue-dex.vercel.app/",
     codeIcon: Gamepad2
   }
 ];

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Github, Linkedin, Mail, Code, Terminal, Cpu, Sparkles, ExternalLink, Bot, X, MessageSquare, ArrowUpRight, Shield, Activity } from 'lucide-react';
+import { Github, Linkedin, Mail, Code, Terminal, Cpu, Sparkles, ExternalLink, Bot, X, MessageSquare, ArrowUpRight, Shield, Activity, FileText } from 'lucide-react';
 import AITwin from '../components/AITwin';
 
 // Advanced WebGL Tactical Radar Grid Shader
@@ -395,6 +395,16 @@ export default function Home() {
                 <Bot className="w-4 h-4 text-primary animate-bounce" />
                 <span>Interact AI Twin</span>
               </button>
+
+              <a
+                href="/resumes/Lakshya_Gupta_Resume.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-lg border border-secondary/20 bg-secondary/5 hover:bg-secondary/10 px-5 py-2.5 text-xs font-semibold text-secondary hover:text-white active:scale-98 transition-all cursor-pointer flex items-center gap-2 clip-cyber-btn"
+              >
+                <FileText className="w-4 h-4 text-secondary" />
+                <span>View Resume</span>
+              </a>
             </motion.div>
 
             {/* Social Connect */}
@@ -431,6 +441,20 @@ export default function Home() {
               >
                 <Mail className="w-4.5 h-4.5" />
               </a>
+            </motion.div>
+
+            {/* Tech Stack Overview */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.55 }}
+              className="flex flex-wrap gap-2 pt-4"
+            >
+              {["Python", "FastAPI", "Next.js", "React", "TypeScript", "scikit-learn", "OpenCV", "MySQL", "tRPC"].map(tech => (
+                <span key={tech} className="text-[10px] font-mono px-2.5 py-0.5 rounded bg-white/[0.02] border border-white/5 text-text-secondary hover:text-white hover:border-primary/25 transition-all">
+                  {tech}
+                </span>
+              ))}
             </motion.div>
           </div>
 
