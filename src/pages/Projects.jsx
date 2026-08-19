@@ -1,41 +1,42 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
-import { Github, ExternalLink, ShieldCheck, Cpu, Code, Binary } from 'lucide-react';
+import { Github, ExternalLink, ShieldCheck, ShieldAlert, Gamepad2, Cpu, Code, Binary } from 'lucide-react';
 
 const projects = [
   {
-    id: "face",
-    title: "Mark My Face",
-    subtitle: "Real-Time Face Recognition Attendance System",
-    category: "AI & Computer Vision",
-    description: "Designed and engineered as our submission for the Smart India Hackathon (SIH) 2025 under Team VISIONEERS. Mark My Face is a computer-vision-based system built to automate class attendance logging for schools and colleges, saving valuable lecturing hours and giving students transparent access to their attendance records.",
+    id: "sentinel",
+    title: "SentinelFlow",
+    subtitle: "Real-Time DDoS Detection & Mitigation Platform",
+    category: "Cybersecurity & ML",
+    description: "Designed and engineered as a state-of-the-art security platform to monitor, identify, and mitigate distributed denial-of-service threats in real-time. Built with a technical blueprint aesthetic, it features real-time network traffic telemetry, custom alert rules creation, automated incident playbooks, and a machine learning anomaly detection engine.",
     bullets: [
-      "Real-time processing: Utilizes optimized OpenCV capture buffers to recognize multiple individuals in under 200ms.",
-      "High accuracy: Integrates state-of-the-art Dlib facial landmark predictors for alignment and representation.",
-      "Zero manual error: Automatically logs timestamps and exports reports to secure local databases."
+      "AI Anomaly Detection Daemon: Integrates scikit-learn's Isolation Forest algorithm running on a FastAPI service to classify volumetric, protocol, or application layer anomalies in real-time.",
+      "Real-Time Traffic Telemetry: High-performance dashboard displaying network volume, request rates, protocol distributions, and IP entropy with live charts.",
+      "Incident Response Playbooks: Interactive mitigation tools allowing operators to construct and deploy automated response chains (block IPs, throttle traffic, rate limit)."
     ],
-    tech: ["Python", "OpenCV", "Face Recognition API", "Dlib", "Machine Learning", "NumPy", "SQLite"],
-    color: "from-cyan-500/20 to-blue-500/5",
-    accent: "text-primary",
-    github: "https://github.com/Lakshyagupta23",
-    codeIcon: Cpu
+    tech: ["React 19", "Tailwind CSS", "FastAPI", "scikit-learn", "Express", "tRPC 11", "MySQL", "Drizzle ORM"],
+    color: "from-amber-500/20 to-yellow-500/5",
+    accent: "text-amber-500",
+    github: "https://github.com/Lakshyagupta23/Sentinelflow-DDOS",
+    live: "https://sentinelflow-web-server.onrender.com/",
+    codeIcon: ShieldAlert
   },
   {
-    id: "eventure",
-    title: "Eventure",
-    subtitle: "Verified College Events Sponsorship Platform",
-    category: "Full-Stack Web Dev",
-    description: "Designed and developed during the Bid2Code Hackathon (where we won 1st place). Eventure is a centralized hub where student event coordinators can publish verified sponsorship brochures, and startups or corporate sponsors can directly purchase packages.",
+    id: "roguedex",
+    title: "RogueDex",
+    subtitle: "Pokémon Randomizer & Team Builder",
+    category: "Web Application",
+    description: "A modern, responsive web application for Pokémon fans that allows users to randomly generate Pokémon, create randomized teams, explore Pokémon information, apply advanced filters, and generate competitive teams. Styled with a polished gaming product UI rather than a basic random-number generator.",
     bullets: [
-      "Secure accounts: Implements encrypted user authentication profiles for organizers and sponsors.",
-      "Brochure management: Allows event hosts to list packages, dates, and expected footfall details in real-time.",
-      "Responsive panel: Leverages custom CSS structures to render mobile-friendly administrative dashboards."
+      "Advanced Filters Panel: Select from Generations 1-9, specific types, and filter by legendary, mythical, paradox, or ultra beast statuses.",
+      "Team Builder Randomizer: Construct randomized party sets matching specific rule constraints for Pokémon challenges.",
+      "Next.js Integration: Built with a highly responsive, optimized Next.js setup fetching live data dynamically from the PokeAPI."
     ],
-    tech: ["HTML5", "CSS3", "JavaScript", "Node.js", "Express", "RESTful APIs", "SQL Database"],
-    color: "from-indigo-500/20 to-purple-500/5",
-    accent: "text-secondary",
-    github: "https://github.com/Lakshyagupta23",
-    codeIcon: Code
+    tech: ["Next.js", "React", "TypeScript", "Tailwind CSS", "PokeAPI", "Framer Motion"],
+    color: "from-red-500/20 to-rose-500/5",
+    accent: "text-red-500",
+    github: "https://github.com/Lakshyagupta23/RogueDex",
+    codeIcon: Gamepad2
   }
 ];
 
@@ -165,13 +166,26 @@ export default function Projects() {
                     <Github className="w-4.5 h-4.5" />
                     <span>View Repository</span>
                   </a>
-                  <button
-                    onClick={() => alert("Project code can be explored directly in the Github repository link provided!")}
-                    className="inline-flex items-center gap-2 text-xs font-semibold text-text-tertiary hover:text-white transition-colors cursor-pointer"
-                  >
-                    <ExternalLink className="w-4.5 h-4.5" />
-                    <span>Explore Code</span>
-                  </button>
+                  {proj.live ? (
+                    <a
+                      href={proj.live}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-xs font-semibold text-text-tertiary hover:text-white transition-colors cursor-pointer"
+                    >
+                      <ExternalLink className="w-4.5 h-4.5" />
+                      <span>View Live Site</span>
+                    </a>
+                  ) : (
+                    <button
+                      onClick={() => alert("Project code can be explored directly in the Github repository link provided!")}
+                      className="inline-flex items-center gap-2 text-xs font-semibold text-text-tertiary hover:text-white transition-colors cursor-pointer"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <ExternalLink className="w-4.5 h-4.5" />
+                      <span>Explore Code</span>
+                    </button>
+                  )}
                 </div>
               </motion.div>
 
@@ -183,21 +197,28 @@ export default function Projects() {
                 transition={{ duration: 0.5, delay: 0.1 }}
                 className={`lg:col-span-6 ${idx % 2 === 0 ? 'lg:order-2' : 'lg:order-1'}`}
               >
-                <div className={`relative aspect-video w-full rounded-2xl bg-gradient-to-br ${proj.color} border border-white/5 p-8 flex items-center justify-center overflow-hidden animate-pulse-glow group`}>
+                <div className={`relative aspect-video w-full rounded-2xl bg-gradient-to-br ${proj.color} border border-white/5 overflow-hidden group shadow-lg flex items-center justify-center`}>
                   
-                  {/* Backdrop grid pattern */}
-                  <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
-
+                  {/* Actual generated preview image */}
+                  <img 
+                    src={proj.id === 'sentinel' ? "/images/sentinelflow.png" : "/images/roguedex.png"} 
+                    alt={`${proj.title} Preview`}
+                    className="absolute inset-0 w-full h-full object-cover opacity-35 group-hover:opacity-50 group-hover:scale-[1.03] transition-all duration-500"
+                  />
+                  
+                  {/* Backdrop overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#030712] via-transparent to-transparent opacity-90" />
+                  
                   {/* Dynamic interactive icons */}
-                  <div className="relative z-10 flex flex-col items-center text-center select-none">
-                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-black/40 border border-white/10 text-white shadow-xl group-hover:scale-110 transition-transform duration-300">
-                      <ProjIcon className={`w-6 h-6 ${proj.accent}`} />
+                  <div className="relative z-10 flex flex-col items-center justify-center text-center select-none p-6">
+                    <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-black/60 border border-white/10 text-white shadow-xl group-hover:scale-105 transition-transform duration-300">
+                      <ProjIcon className={`w-5.5 h-5.5 ${proj.accent}`} />
                     </div>
-                    <span className="text-xs font-mono font-semibold uppercase tracking-[0.2em] text-white">
-                      {proj.id === 'face' ? "Vision Buffer" : "Platform Hub"}
+                    <span className="text-[10px] font-mono font-semibold uppercase tracking-[0.2em] text-white">
+                      {proj.id === 'sentinel' ? "Traffic Monitor" : "Pokedex Engine"}
                     </span>
-                    <span className="mt-1.5 text-[10px] text-text-tertiary font-mono">
-                      {proj.id === 'face' ? "model.eval() · OpenCV active" : "rest_api_endpoint · listening"}
+                    <span className="mt-1 text-[9px] text-text-tertiary font-mono">
+                      {proj.id === 'sentinel' ? "scikit-learn · Active Protection" : "nextjs-api-route · listening"}
                     </span>
                   </div>
 
@@ -205,7 +226,7 @@ export default function Projects() {
                     SYS_ACTIVE
                   </div>
                   <div className="absolute bottom-4 right-4 text-[9px] font-mono text-primary font-semibold select-none">
-                    {proj.id === 'face' ? "FPS: 60" : "PORT: 5000"}
+                    {proj.id === 'sentinel' ? "PORT: 3000" : "PORT: 3000"}
                   </div>
                 </div>
               </motion.div>

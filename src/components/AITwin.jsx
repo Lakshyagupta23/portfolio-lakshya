@@ -11,8 +11,8 @@ const LAKSHYA_BOT_PROFILE = {
     { id: "intern", text: "Explain your AI/ML internship" },
     { id: "hacksphere", text: "What is HackSphere & your role?" },
     { id: "thinkai", text: "Tell me about THINK AI IPEC" },
-    { id: "face", text: "What is 'Mark My Face'?" },
-    { id: "eventure", text: "What is the 'Eventure' project?" },
+    { id: "sentinel", text: "What is 'SentinelFlow'?" },
+    { id: "roguedex", text: "What is 'RogueDex'?" },
     { id: "hackathons", text: "What hackathons have you won?" }
   ],
   responses: {
@@ -25,6 +25,14 @@ const LAKSHYA_BOT_PROFILE = {
     hacksphere: `As the Social Media Lead for HackSphere, I direct developer branding, design outreach campaigns, and coordinate peer developer sprints and tech bootcamps to support our campus developer ecosystem.`,
 
     inaayat: `Inaayat is my creative outlet and dramatics society where I participate in street plays (Nukkad Natak). While it is a side hobby, it has been instrumental in building my public speaking, stage presence, and confidence in managing team collaboration.`,
+
+    sentinelflow: `**SentinelFlow** is a premium, real-time DDoS Detection and Mitigation Platform.
+*   *Key Features*: Real-time traffic telemetry charts, custom alert rule builders, and automated mitigation playbooks (blocking IPs, throttling traffic).
+*   *Technical Details*: Integrates scikit-learn's Isolation Forest anomaly classification model on a FastAPI service to detect volumetric/application layer anomalies. Built on a React 19 + Tailwind CSS client, with an Express/tRPC backend connecting to MySQL/TiDB database pools via Drizzle ORM.`,
+
+    roguedex: `**RogueDex** is a high-fidelity Pokémon database, randomizer, and team builder web application designed like a polished gaming product dashboard.
+*   *Key Features*: Core randomizer with animations, advanced filtering (Gens 1-9, types, legendary/mythical status), and team builder challenge rules.
+*   *Technical Details*: Built with Next.js, TypeScript, Tailwind CSS, and Framer Motion, fetching live assets and statistics dynamically from the PokeAPI.`,
 
     face: `**Mark My Face** is a real-time face recognition attendance tracker built in Python using OpenCV and Dlib. 
 *   *Technical Decisions*: We engineered this under Team VISIONEERS for the Smart India Hackathon (SIH) 2025. We chose Dlib's 68-point landmark predictor and deep-metric ResNet face recognition model over MediaPipe because it provided superior classification consistency in complex classroom lighting and angles. Facial embeddings (128D) are matched in SQLite in <200ms, saving lecture hours for teachers.`,
@@ -69,7 +77,7 @@ const LAKSHYA_BOT_PROFILE = {
 *   **GitHub**: github.com/Lakshyagupta23`
     }
   ],
-  defaultResponse: "I'm not sure about that specific topic. You can ask me about my B.Tech studies, my AI internship at KVGAI Tech, my projects ('Mark My Face' and 'Eventure'), my hackathon achievements, or check my contact info!"
+  defaultResponse: "I'm not sure about that specific topic. You can ask me about my B.Tech studies, my AI internship at KVGAI Tech, my projects ('SentinelFlow', 'RogueDex', 'Mark My Face', and 'Eventure'), my hackathon achievements, or check my contact info!"
 };
 
 function getLakshyaAIResponse(input) {
@@ -95,6 +103,12 @@ function getLakshyaAIResponse(input) {
   }
   if (query.includes("inaayat") || query.includes("dramatics") || query.includes("play") || query.includes("theater")) {
     return LAKSHYA_BOT_PROFILE.responses.inaayat;
+  }
+  if (query.includes("sentinelflow") || query.includes("sentinel") || query.includes("ddos")) {
+    return LAKSHYA_BOT_PROFILE.responses.sentinelflow;
+  }
+  if (query.includes("roguedex") || query.includes("rogue") || query.includes("pokemon") || query.includes("pokédex") || query.includes("pokedex")) {
+    return LAKSHYA_BOT_PROFILE.responses.roguedex;
   }
   if (query.includes("face") || query.includes("mark my face") || query.includes("recognition")) {
     return LAKSHYA_BOT_PROFILE.responses.face;

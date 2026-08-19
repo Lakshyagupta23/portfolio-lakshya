@@ -464,15 +464,15 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            {/* Mark My Face */}
+            {/* SentinelFlow */}
             <div className="glass-panel group p-1.5 rounded-xl transition-all duration-300 hover:scale-[1.01] hover:border-primary/20 hover:shadow-[0_0_30px_rgba(0,242,255,0.12)] clip-cyber hud-brackets">
               <div className="hud-brackets-bottom" />
               <div className="relative overflow-hidden rounded-lg bg-surface-container/20">
                 <div className="aspect-video w-full bg-slate-950 flex items-center justify-center overflow-hidden relative">
                   <img 
                     className="w-full h-full object-cover opacity-40 group-hover:scale-[1.03] transition-transform duration-500" 
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDIRsAnCJSzz5KnP2CVDZqKiQOts6SeWkV4qZlbPLM3V8oq0JDV6t2s0trVNxVLZWH1kM_LnNtHgd2Z0qi0Ll7VYvFc5jV_5bdjbLRkezNJgemRhD_dCkqhPF47wYR7SQfoB0yMi7F3Luia4sba5bHF-nv270yDUsHX0phLwSsbkuc6mnaASQXFCURgMbTi48aT8DLNVJtf0PBPCgJHMWaISsskm_CaJEYxVw5YWCGcygY55Q8QARFS68uOUtGTGWuAaUvbIao4tgE"
-                    alt="Mark My Face Dashboard"
+                    src="/images/sentinelflow.png"
+                    alt="SentinelFlow Dashboard"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/40 to-transparent"></div>
                   
@@ -484,26 +484,26 @@ export default function Home() {
                 
                 <div className="absolute bottom-6 left-6 right-6">
                   <div className="flex gap-2 mb-3">
-                    <span className="px-2 py-1 bg-primary/10 border border-primary/20 text-[9px] font-mono text-primary rounded">SIH 2025</span>
-                    <span className="px-2 py-1 bg-white/5 text-[9px] font-mono text-text-secondary rounded">OPENCV / DLIB</span>
+                    <span className="px-2 py-1 bg-primary/10 border border-primary/20 text-[9px] font-mono text-primary rounded">SECURITY / ML</span>
+                    <span className="px-2 py-1 bg-white/5 text-[9px] font-mono text-text-secondary rounded">SCIKIT-LEARN / TRPC</span>
                   </div>
-                  <h3 className="text-lg font-semibold font-display text-white mb-1.5">Mark My Face</h3>
+                  <h3 className="text-lg font-semibold font-display text-white mb-1.5">SentinelFlow</h3>
                   <p className="text-xs text-text-secondary line-clamp-2 leading-relaxed">
-                    Flagship Smart India Hackathon facial attendance logging application powered by OpenCV Dlib face landmarks.
+                    Real-time DDoS threat mitigation platform powered by an Isolation Forest anomaly model and live traffic telemetry.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Eventure */}
+            {/* RogueDex */}
             <div className="glass-panel group p-1.5 rounded-xl transition-all duration-300 hover:scale-[1.01] hover:border-primary/20 hover:shadow-[0_0_30px_rgba(0,242,255,0.12)] clip-cyber hud-brackets">
               <div className="hud-brackets-bottom" />
               <div className="relative overflow-hidden rounded-lg bg-surface-container/20">
                 <div className="aspect-video w-full bg-slate-950 flex items-center justify-center overflow-hidden relative">
                   <img 
                     className="w-full h-full object-cover opacity-40 group-hover:scale-[1.03] transition-transform duration-500" 
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGlYOcLbCVLWViZUFARM9Lg4L0HX6yvaTnFCdjjLhciRN1IyMUlaDWYjp_VSB01twfcrf4HRE1x_alkeEYf0OCnKoXAD5taHDYL-d21ADDMSD8g3c2oKQ2RCDK64oU4IimPH0BpUka0E4YQzFr1aEHzLLqj4QTmvb51NCWmRXYclLQq6PHTNGCU_dZXiwJYyeBHnb8kTQZA0SCX_nACYXV_Ruk8oaVy83hPkSK36wtBXSlntJGpBmvgtavh_JKHzyMPe18zelmu00"
-                    alt="Eventure Network Map"
+                    src="/images/roguedex.png"
+                    alt="RogueDex Dashboard"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/40 to-transparent"></div>
                   
@@ -513,12 +513,12 @@ export default function Home() {
                 
                 <div className="absolute bottom-6 left-6 right-6">
                   <div className="flex gap-2 mb-3">
-                    <span className="px-2 py-1 bg-secondary/10 border border-secondary/20 text-[9px] font-mono text-secondary rounded">BID2CODE WIN</span>
-                    <span className="px-2 py-1 bg-white/5 text-[9px] font-mono text-text-secondary rounded">NODE.JS / SECURE</span>
+                    <span className="px-2 py-1 bg-secondary/10 border border-secondary/20 text-[9px] font-mono text-secondary rounded">GAMING APP</span>
+                    <span className="px-2 py-1 bg-white/5 text-[9px] font-mono text-text-secondary rounded">NEXT.JS / POKEAPI</span>
                   </div>
-                  <h3 className="text-lg font-semibold font-display text-white mb-1.5">Eventure</h3>
+                  <h3 className="text-lg font-semibold font-display text-white mb-1.5">RogueDex</h3>
                   <p className="text-xs text-text-secondary line-clamp-2 leading-relaxed">
-                    Sponsorship matching platform featuring automated credential mapping and secure corporate dashboard.
+                    Polished Pokémon randomizer team builder and information hub featuring holographic cards and custom filters.
                   </p>
                 </div>
               </div>
