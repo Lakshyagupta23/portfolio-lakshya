@@ -1,120 +1,186 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Home, User, FolderGit2, Bot, Mail, Github, Linkedin } from 'lucide-react';
-
-const sidebarVariants = {
-  open: {
-    clipPath: "circle(1200px at 48px 48px)",
-    transition: {
-      type: "spring",
-      stiffness: 40,
-      restDelta: 2
-    }
-  },
-  closed: {
-    clipPath: "circle(24px at 48px 48px)",
-    transition: {
-      delay: 0.1,
-      type: "spring",
-      stiffness: 300,
-      damping: 40
-    }
-  }
-};
+﻿import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Github, Linkedin } from "lucide-react";
 
 const navItems = [
-  { path: '/', label: 'Home', icon: Home },
-  { path: '/about', label: 'About Me', icon: User },
-  { path: '/projects', label: 'Projects', icon: FolderGit2 },
-  { path: '/ai-twin', label: 'AI Twin Chat', icon: Bot },
-  { path: '/contact', label: 'Contact', icon: Mail }
+  { path: "/", label: "Home" },
+  { path: "/about", label: "About" },
+  { path: "/projects", label: "Projects" },
+  { path: "/ai-twin", label: "AI Twin" },
+  { path: "/contact", label: "Contact" },
 ];
 
-const listVariants = {
-  open: {
-    transition: { staggerChildren: 0.07, delayChildren: 0.2 }
-  },
-  closed: {
-    transition: { staggerChildren: 0.05, staggerDirection: -1 }
-  }
-};
-
-const itemVariants = {
-  open: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      y: { stiffness: 1000, velocity: -100 }
-    }
-  },
-  closed: {
-    y: 30,
-    opacity: 0,
-    transition: {
-      y: { stiffness: 1000 }
-    }
-  }
-};
-
-export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false);
+export default function TopNav() {
   const location = useLocation();
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const toggleSidebar = () => setIsOpen(!isOpen);
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 30);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    setMenuOpen(false);
+    document.body.style.overflow = "auto";
+  }, [location]);
+
+  const toggleMenu = () => {
+    const next = !menuOpen;
+    setMenuOpen(next);
+    document.body.style.overflow = next ? "hidden" : "auto";
+  };
 
   return (
-    <div className="fixed top-0 left-0 bottom-0 z-50 pointer-events-none">
-      {/* Sidebar background and overlay */}
-      <motion.div
-        initial={false}
-        animate={isOpen ? "open" : "closed"}
-        variants={sidebarVariants}
-        className="absolute top-0 left-0 bottom-0 w-72 sm:w-80 bg-[#070b14]/98 border-r border-white/5 backdrop-blur-2xl pointer-events-auto"
+    <>
+      {/* Fixed top bar */}
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 flex h-16 items-center justify-between px-6 md:px-12 lg:px-20 transition-all duration-500 ${
+          scrolled
+            ? "border-b border-[rgba(240,236,227,0.06)] bg-[rgba(14,12,10,0.92)] backdrop-blur-xl"
+            : "bg-transparent"
+        }`}
       >
-        <div className="flex flex-col h-full justify-between pt-24 px-6 pb-8">
-          {/* Nav Links */}
-          <motion.ul variants={listVariants} className="space-y-4">
-            {navItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              const Icon = item.icon;
-
-              return (
-                <motion.li
-                  key={item.path}
-                  variants={itemVariants}
-                  whileHover={{ scale: 1.03, x: 4 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Link
-                    to={item.path}
-                    onClick={() => setIsOpen(false)}
-                    className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 ${
-                      isActive
-                        ? 'bg-primary/10 border border-primary/20 text-primary shadow-[0_0_15px_rgba(0,242,255,0.05)]'
-                        : 'text-text-secondary border border-transparent hover:text-white hover:bg-white/[0.02]'
-                    }`}
-                  >
-                    <Icon className="w-5 h-5 shrink-0" />
-                    <span className="text-sm font-semibold font-display tracking-wide">{item.label}</span>
-                  </Link>
-                </motion.li>
-              );
-            })}
-          </motion.ul>
-
-          {/* Sidebar Footer */}
-          <motion.div 
-            variants={itemVariants}
-            className="border-t border-white/5 pt-6 flex flex-col gap-4"
+        {/* Logo */}
+        <Link
+          to="/"
+          className="flex items-center gap-2 group"
+          aria-label="Home"
+        >
+          <div
+            className="flex h-8 w-8 items-center justify-center border border-[rgba(201,168,76,0.35)] text-[#c9a84c] text-xs font-bold font-display tracking-widest transition-colors duration-300 group-hover:bg-[rgba(201,168,76,0.08)] group-hover:border-[rgba(201,168,76,0.6)]"
+            style={{ borderRadius: "2px", fontFamily: '"Sora", sans-serif' }}
           >
-            <div className="flex items-center gap-4 px-2">
+            LG
+          </div>
+          <span
+            className="hidden sm:block text-[11px] font-medium tracking-[0.15em] uppercase text-[rgba(240,236,227,0.55)] group-hover:text-[rgba(240,236,227,0.85)] transition-colors duration-300"
+            style={{ fontFamily: '"Outfit", sans-serif' }}
+          >
+            Lakshya Gupta
+          </span>
+        </Link>
+
+        {/* Desktop nav */}
+        <nav className="hidden md:flex items-center gap-7" aria-label="Main navigation">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`nav-link-wrap text-[12px] font-medium tracking-[0.08em] uppercase transition-colors duration-200 ${
+                  isActive
+                    ? "nav-link-active text-[#c9a84c]"
+                    : "text-[rgba(240,236,227,0.55)] hover:text-[rgba(240,236,227,0.9)]"
+                }`}
+                style={{ fontFamily: '"Outfit", sans-serif' }}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Right side: socials + hamburger */}
+        <div className="flex items-center gap-4">
+          <a
+            href="https://github.com/Lakshyagupta23"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:flex text-[rgba(240,236,227,0.4)] hover:text-[rgba(240,236,227,0.9)] transition-colors duration-200"
+            aria-label="GitHub"
+          >
+            <Github className="w-4 h-4" />
+          </a>
+          <a
+            href="https://linkedin.com/in/lakshya-gupta-822770301"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:flex text-[rgba(240,236,227,0.4)] hover:text-[rgba(240,236,227,0.9)] transition-colors duration-200"
+            aria-label="LinkedIn"
+          >
+            <Linkedin className="w-4 h-4" />
+          </a>
+
+          {/* Mobile hamburger */}
+          <button
+            id="mobile-menu-btn"
+            onClick={toggleMenu}
+            className="flex md:hidden flex-col gap-[5px] p-2 cursor-pointer"
+            aria-label="Toggle menu"
+          >
+            <motion.span
+              className="block w-5 h-[1.5px] bg-[rgba(240,236,227,0.7)]"
+              animate={menuOpen ? { rotate: 45, y: 6.5 } : { rotate: 0, y: 0 }}
+              transition={{ duration: 0.3 }}
+            />
+            <motion.span
+              className="block w-5 h-[1.5px] bg-[rgba(240,236,227,0.7)]"
+              animate={menuOpen ? { opacity: 0 } : { opacity: 1 }}
+              transition={{ duration: 0.2 }}
+            />
+            <motion.span
+              className="block w-5 h-[1.5px] bg-[rgba(240,236,227,0.7)]"
+              animate={menuOpen ? { rotate: -45, y: -6.5 } : { rotate: 0, y: 0 }}
+              transition={{ duration: 0.3 }}
+            />
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile full-screen overlay */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            key="mobile-menu"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-40 bg-[#0e0c0a] flex flex-col justify-center px-10"
+          >
+            <motion.nav
+              className="flex flex-col gap-6"
+              initial="closed"
+              animate="open"
+              exit="closed"
+              variants={{
+                open: { transition: { staggerChildren: 0.07, delayChildren: 0.1 } },
+                closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
+              }}
+            >
+              {navItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <motion.div
+                    key={item.path}
+                    variants={{
+                      open: { opacity: 1, x: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
+                      closed: { opacity: 0, x: -30, transition: { duration: 0.3 } },
+                    }}
+                  >
+                    <Link
+                      to={item.path}
+                      className={`text-4xl font-bold tracking-tight transition-colors duration-200 ${
+                        isActive ? "text-[#c9a84c]" : "text-[rgba(240,236,227,0.6)] hover:text-[#f0ece3]"
+                      }`}
+                      style={{ fontFamily: '"Sora", sans-serif' }}
+                    >
+                      {item.label}
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </motion.nav>
+            <div className="flex gap-6 mt-16 border-t border-[rgba(240,236,227,0.06)] pt-8">
               <a
                 href="https://github.com/Lakshyagupta23"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-text-tertiary hover:text-white hover:scale-110 transition-all"
-                aria-label="GitHub"
+                className="text-[rgba(240,236,227,0.4)] hover:text-[rgba(240,236,227,0.9)] transition-colors duration-200"
               >
                 <Github className="w-5 h-5" />
               </a>
@@ -122,50 +188,14 @@ export default function Sidebar() {
                 href="https://linkedin.com/in/lakshya-gupta-822770301"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-text-tertiary hover:text-white hover:scale-110 transition-all"
-                aria-label="LinkedIn"
+                className="text-[rgba(240,236,227,0.4)] hover:text-[rgba(240,236,227,0.9)] transition-colors duration-200"
               >
                 <Linkedin className="w-5 h-5" />
               </a>
             </div>
-            <p className="text-[10px] text-text-tertiary font-mono px-2">
-              © {new Date().getFullYear()} LAKSHYA GUPTA
-            </p>
           </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Toggle Button */}
-      <button
-        onClick={toggleSidebar}
-        className="absolute top-6 left-6 z-50 flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-black/40 hover:bg-black/60 backdrop-blur-md pointer-events-auto cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary/40 transition-colors"
-        aria-label="Toggle navigation menu"
-      >
-        <svg width="20" height="20" viewBox="0 0 23 23" fill="none">
-          <motion.path
-            strokeWidth="2.5"
-            stroke="currentColor"
-            strokeLinecap="round"
-            animate={isOpen ? { d: "M 3 16.5 L 17 2.5" } : { d: "M 2 2.5 L 20 2.5" }}
-            className="text-white"
-          />
-          <motion.path
-            strokeWidth="2.5"
-            stroke="currentColor"
-            strokeLinecap="round"
-            d="M 2 9.423 L 20 9.423"
-            animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
-            className="text-white"
-          />
-          <motion.path
-            strokeWidth="2.5"
-            stroke="currentColor"
-            strokeLinecap="round"
-            animate={isOpen ? { d: "M 3 2.5 L 17 16.5" } : { d: "M 2 16.346 L 20 16.346" }}
-            className="text-white"
-          />
-        </svg>
-      </button>
-    </div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

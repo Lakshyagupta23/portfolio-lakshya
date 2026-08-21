@@ -1,239 +1,218 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
-import { Github, ExternalLink, ShieldCheck, ShieldAlert, Gamepad2, Cpu, Code, Binary } from 'lucide-react';
+﻿import React from "react";
+import { motion } from "framer-motion";
+import { Github, ExternalLink } from "lucide-react";
 
 const projects = [
   {
+    num: "01",
     id: "sentinel",
     title: "SentinelFlow",
     subtitle: "Real-Time DDoS Detection & Mitigation Platform",
-    category: "Cybersecurity & ML",
-    description: "Designed and engineered as a state-of-the-art security platform to monitor, identify, and mitigate distributed denial-of-service threats in real-time. Built with a technical blueprint aesthetic, it features real-time network traffic telemetry, custom alert rules creation, automated incident playbooks, and a machine learning anomaly detection engine.",
+    category: "Cybersecurity & Machine Learning",
+    description: "A production-grade security platform for monitoring, identifying, and mitigating distributed denial-of-service threats in real time. Combines a FastAPI-powered ML service running scikit-learn's Isolation Forest algorithm with a high-performance React dashboard for live traffic telemetry, custom alert rules, and automated incident playbooks.",
     bullets: [
-      "AI Anomaly Detection Daemon: Integrates scikit-learn's Isolation Forest algorithm running on a FastAPI service to classify volumetric, protocol, or application layer anomalies in real-time.",
-      "Real-Time Traffic Telemetry: High-performance dashboard displaying network volume, request rates, protocol distributions, and IP entropy with live charts.",
-      "Incident Response Playbooks: Interactive mitigation tools allowing operators to construct and deploy automated response chains (block IPs, throttle traffic, rate limit)."
+      "Isolation Forest anomaly engine classifies volumetric, protocol, and application-layer attacks in real time",
+      "High-performance live traffic telemetry with request rate charts, protocol distributions, and IP entropy",
+      "Automated mitigation playbooks: block IPs, throttle traffic, enforce rate limits via a tRPC API",
     ],
-    tech: ["React 19", "Tailwind CSS", "FastAPI", "scikit-learn", "Express", "tRPC 11", "MySQL", "Drizzle ORM"],
-    color: "from-amber-500/20 to-yellow-500/5",
-    accent: "text-amber-500",
+    tech: ["React 19", "Tailwind CSS", "FastAPI", "scikit-learn", "Express", "tRPC 11", "MySQL / TiDB", "Drizzle ORM"],
     github: "https://github.com/Lakshyagupta23/Sentinelflow-DDOS",
     live: "https://sentinelflow-web-server.onrender.com/",
-    codeIcon: ShieldAlert
   },
   {
+    num: "02",
     id: "roguedex",
     title: "RogueDex",
     subtitle: "Pokémon Randomizer & Team Builder",
     category: "Web Application",
-    description: "A modern, responsive web application for Pokémon fans that allows users to randomly generate Pokémon, create randomized teams, explore Pokémon information, apply advanced filters, and generate competitive teams. Styled with a polished gaming product UI rather than a basic random-number generator.",
+    description: "A modern, type-safe web application for Pokémon enthusiasts featuring a production-level randomizer engine, competitive team builder, and comprehensive Pokédex. Built with Next.js and TypeScript for maximum performance with data sourced live from PokeAPI, wrapped in a polished holographic design system.",
     bullets: [
-      "Advanced Filters Panel: Select from Generations 1-9, specific types, and filter by legendary, mythical, paradox, or ultra beast statuses.",
-      "Team Builder Randomizer: Construct randomized party sets matching specific rule constraints for Pokémon challenges.",
-      "Next.js Integration: Built with a highly responsive, optimized Next.js setup fetching live data dynamically from the PokeAPI."
+      "Advanced filter panel across Generations 1-9, all types, legendary/mythical/paradox statuses",
+      "Team builder randomizer with rule constraints for Nuzlocke-style challenges",
+      "Next.js App Router with dynamic API routes for fast, type-safe PokeAPI integration",
     ],
     tech: ["Next.js", "React", "TypeScript", "Tailwind CSS", "PokeAPI", "Framer Motion"],
-    color: "from-red-500/20 to-rose-500/5",
-    accent: "text-red-500",
     github: "https://github.com/Lakshyagupta23/RogueDex",
     live: "https://rogue-dex.vercel.app/",
-    codeIcon: Gamepad2
-  }
+  },
+  {
+    num: "03",
+    id: "markface",
+    title: "Mark My Face",
+    subtitle: "Real-Time Face Recognition Attendance System",
+    category: "Computer Vision · AI",
+    description: "A Python-based face recognition attendance system engineered for SIH 2025. Uses Dlib's 68-point landmark predictor and a deep-metric ResNet model to log attendance in under 200ms per frame, with full-session reporting stored in SQLite.",
+    bullets: [
+      "Dlib 68-point landmark predictor selected over MediaPipe for superior classroom lighting tolerance",
+      "128-dimensional facial embeddings matched against registered employee/student database in SQLite",
+      "Sub-200ms attendance verification per face at 30 FPS camera feed",
+    ],
+    tech: ["Python", "OpenCV", "Dlib", "SQLite", "NumPy"],
+    github: "https://github.com/Lakshyagupta23",
+    live: null,
+  },
+  {
+    num: "04",
+    id: "eventure",
+    title: "Eventure",
+    subtitle: "Verified College Events Sponsorship Platform",
+    category: "Full-Stack · Hackathon Winner",
+    description: "A dual-key verified sponsorship marketplace connecting student event organisers with corporate sponsors. Won 1st place at JECRC Bid2Code Hackathon (2024). Implements a signed contract verification system to eliminate false sponsorship agreements common on informal channels.",
+    bullets: [
+      "Dual-key verification flow: both parties must sign off for a sponsorship contract to activate",
+      "Corporate and event-host profile dashboards with deal tracking and status management",
+      "Node.js + Express REST API with SQL relational schema for verified agreement records",
+    ],
+    tech: ["Node.js", "Express", "SQL", "HTML/CSS", "JavaScript"],
+    github: "https://github.com/Lakshyagupta23",
+    live: null,
+  },
 ];
 
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 28 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-80px" },
+  transition: { duration: 0.65, delay, ease: [0.16, 1, 0.3, 1] },
+});
+
 export default function Projects() {
-  const containerRef = useRef(null);
-  
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
-
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
-
-  const bannerRef = useRef(null);
-  const { scrollYProgress: bannerScroll } = useScroll({
-    target: bannerRef,
-    offset: ["start start", "end start"]
-  });
-  
-  const bannerY = useTransform(bannerScroll, [0, 1], ["0%", "80%"]);
-  const gridY = useTransform(bannerScroll, [0, 1], ["0%", "30%"]);
-
   return (
-    <div ref={containerRef} className="w-full bg-transparent pb-32">
-      {/* Sticky Progress Bar */}
-      <motion.div 
-        style={{ scaleX }}
-        className="fixed top-0 left-0 right-0 z-50 h-1 bg-gradient-to-r from-primary via-secondary to-primary origin-left"
-      />
+    <div className="relative min-h-screen w-full px-6 pt-28 pb-28 md:px-12 lg:px-20">
+      <div className="mx-auto max-w-5xl">
 
-      {/* Cyber Grid Parallax Header (Clean mesh - no overlapping code text cards!) */}
-      <div ref={bannerRef} className="relative flex h-[45vh] w-full items-center justify-center overflow-hidden bg-gradient-to-b from-[#0b0f19]/40 to-[#030712] border-b border-white/5 select-none">
-        
-        {/* Background Cyber Grid */}
-        <motion.div 
-          style={{ y: gridY }}
-          className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:40px_40px] opacity-40"
-        />
-
-        <motion.div 
-          style={{ y: bannerY }}
-          className="relative z-10 text-center px-4"
-        >
-          <div className="inline-flex items-center gap-1.5 text-xs text-primary font-mono tracking-widest uppercase mb-3">
-            <Binary className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '6s' }} />
-            <span>SYS_READOUT: PORTFOLIO_INDEX</span>
-          </div>
-          <h1 className="text-5xl font-extrabold tracking-tight font-display text-white sm:text-7xl">
-            PROJECTS
-          </h1>
-          <p className="mt-3 text-xs font-mono text-text-secondary tracking-wide">
-            Source Code, AI Architectures, & Applied Engineering
-          </p>
-        </motion.div>
-      </div>
-
-      {/* Projects Feed */}
-      <div className="mx-auto max-w-5xl px-6 pt-24 md:px-12 space-y-32">
-        {projects.map((proj, idx) => {
-          const ProjIcon = proj.codeIcon;
-          
-          return (
-            <div 
-              key={proj.id}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center"
+        {/* Page header */}
+        <div className="relative mb-16">
+          <span className="page-num" aria-hidden="true">02</span>
+          <motion.div {...fadeUp(0)} className="space-y-3">
+            <span className="label-tag">Selected Work</span>
+            <h1
+              className="text-5xl sm:text-6xl font-extrabold tracking-tight text-[#f0ece3] leading-none"
+              style={{ fontFamily: '"Sora", sans-serif' }}
             >
-              {/* Technical Description Column */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.5 }}
-                className={`lg:col-span-6 space-y-6 ${idx % 2 === 0 ? 'lg:order-1' : 'lg:order-2'}`}
+              Projects &<br />Engineering
+            </h1>
+          </motion.div>
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 1, delay: 0.4, ease: [0.16,1,0.3,1] }}
+            className="mt-8 h-px bg-[rgba(201,168,76,0.2)] origin-left"
+          />
+        </div>
+
+        {/* Project cards */}
+        <div className="space-y-6">
+          {projects.map((proj, idx) => (
+            <motion.div
+              key={proj.id}
+              {...fadeUp(idx * 0.1)}
+              className="card-surface rounded-[3px] p-8 md:p-10 group relative overflow-hidden"
+            >
+              {/* Large project number watermark */}
+              <span
+                className="absolute top-6 right-8 font-bold text-[rgba(201,168,76,0.05)] pointer-events-none select-none"
+                style={{ fontFamily: '"Sora", sans-serif', fontSize: "clamp(60px, 8vw, 110px)", lineHeight: 1 }}
+                aria-hidden="true"
               >
-                <div className="space-y-2">
-                  <span className="text-[10px] font-mono text-primary uppercase tracking-widest font-semibold">
-                    {proj.category}
-                  </span>
-                  <h2 className="text-3xl font-extrabold tracking-tight font-display text-white">
+                {proj.num}
+              </span>
+
+              <div className="relative z-10 space-y-6">
+                {/* Header */}
+                <div className="space-y-1">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span
+                      className="text-[10px] text-[rgba(201,168,76,0.7)] font-mono uppercase tracking-widest"
+                      style={{ fontFamily: '"JetBrains Mono", monospace' }}
+                    >
+                      {proj.category}
+                    </span>
+                  </div>
+                  <h2
+                    className="text-3xl font-bold text-[#f0ece3]"
+                    style={{ fontFamily: '"Sora", sans-serif' }}
+                  >
                     {proj.title}
                   </h2>
-                  <p className="text-sm font-semibold text-text-secondary leading-normal font-display">
+                  <p
+                    className="text-sm text-[rgba(240,236,227,0.45)] font-medium"
+                    style={{ fontFamily: '"Outfit", sans-serif' }}
+                  >
                     {proj.subtitle}
                   </p>
                 </div>
 
-                <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
-                  {proj.description}
-                </p>
+                <div className="h-px bg-[rgba(240,236,227,0.05)]" />
 
-                <div className="space-y-3">
-                  <h4 className="text-xs font-mono font-bold text-white uppercase tracking-wider">Engineering Focus:</h4>
-                  <ul className="space-y-2">
-                    {proj.bullets.map((bullet, bIdx) => (
-                      <li key={bIdx} className="flex items-start gap-2 text-xs text-text-tertiary leading-relaxed">
-                        <ShieldCheck className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                        <span>{bullet}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Tech Badges */}
-                <div className="flex flex-wrap gap-1.5 pt-2">
-                  {proj.tech.map(t => (
-                    <span 
-                      key={t}
-                      className="text-[10px] font-mono px-2.5 py-0.5 rounded bg-white/[0.03] border border-white/5 text-text-secondary"
+                {/* Two columns */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                  {/* Description */}
+                  <div className="md:col-span-7 space-y-5">
+                    <p
+                      className="text-sm text-[rgba(240,236,227,0.55)] leading-relaxed"
+                      style={{ fontFamily: '"Outfit", sans-serif' }}
                     >
-                      {t}
-                    </span>
-                  ))}
-                </div>
+                      {proj.description}
+                    </p>
 
-                {/* Actions */}
-                <div className="flex items-center gap-4 pt-4 border-t border-white/5">
-                  <a
-                    href={proj.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-xl bg-white/[0.03] border border-white/10 hover:border-primary/30 hover:bg-primary/[0.04] px-4.5 py-2.5 text-xs font-semibold text-white transition-all cursor-pointer"
-                  >
-                    <Github className="w-4.5 h-4.5" />
-                    <span>View Repository</span>
-                  </a>
-                  {proj.live ? (
-                    <a
-                      href={proj.live}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-xs font-semibold text-text-tertiary hover:text-white transition-colors cursor-pointer"
-                    >
-                      <ExternalLink className="w-4.5 h-4.5" />
-                      <span>View Live Site</span>
-                    </a>
-                  ) : (
-                    <button
-                      onClick={() => alert("Project code can be explored directly in the Github repository link provided!")}
-                      className="inline-flex items-center gap-2 text-xs font-semibold text-text-tertiary hover:text-white transition-colors cursor-pointer"
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <ExternalLink className="w-4.5 h-4.5" />
-                      <span>Explore Code</span>
-                    </button>
-                  )}
-                </div>
-              </motion.div>
+                    <ul className="space-y-2">
+                      {proj.bullets.map((b, bi) => (
+                        <li key={bi} className="flex items-start gap-3 text-xs text-[rgba(240,236,227,0.4)]" style={{ fontFamily: '"Outfit", sans-serif' }}>
+                          <span className="mt-1.5 w-1 h-1 rounded-full bg-[rgba(201,168,76,0.5)] shrink-0" />
+                          {b}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
-              {/* Graphic Placeholder Column */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className={`lg:col-span-6 ${idx % 2 === 0 ? 'lg:order-2' : 'lg:order-1'}`}
-              >
-                <div className={`relative aspect-video w-full rounded-2xl bg-gradient-to-br ${proj.color} border border-white/5 overflow-hidden group shadow-lg flex items-center justify-center`}>
-                  
-                  {/* Actual generated preview image */}
-                  <img 
-                    src={proj.id === 'sentinel' ? "/images/sentinelflow.png" : "/images/roguedex.png"} 
-                    alt={`${proj.title} Preview`}
-                    className="absolute inset-0 w-full h-full object-cover opacity-35 group-hover:opacity-50 group-hover:scale-[1.03] transition-all duration-500"
-                  />
-                  
-                  {/* Backdrop overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#030712] via-transparent to-transparent opacity-90" />
-                  
-                  {/* Dynamic interactive icons */}
-                  <div className="relative z-10 flex flex-col items-center justify-center text-center select-none p-6">
-                    <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-black/60 border border-white/10 text-white shadow-xl group-hover:scale-105 transition-transform duration-300">
-                      <ProjIcon className={`w-5.5 h-5.5 ${proj.accent}`} />
+                  {/* Tech + Links */}
+                  <div className="md:col-span-5 space-y-6">
+                    <div>
+                      <p
+                        className="text-[10px] uppercase tracking-widest text-[rgba(240,236,227,0.25)] mb-2"
+                        style={{ fontFamily: '"JetBrains Mono", monospace' }}
+                      >
+                        Stack
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {proj.tech.map((t) => (
+                          <span key={t} className="tech-pill">{t}</span>
+                        ))}
+                      </div>
                     </div>
-                    <span className="text-[10px] font-mono font-semibold uppercase tracking-[0.2em] text-white">
-                      {proj.id === 'sentinel' ? "Traffic Monitor" : "Pokedex Engine"}
-                    </span>
-                    <span className="mt-1 text-[9px] text-text-tertiary font-mono">
-                      {proj.id === 'sentinel' ? "scikit-learn · Active Protection" : "nextjs-api-route · listening"}
-                    </span>
-                  </div>
 
-                  <div className="absolute top-4 left-4 text-[9px] text-text-tertiary font-mono uppercase tracking-wider select-none">
-                    SYS_ACTIVE
-                  </div>
-                  <div className="absolute bottom-4 right-4 text-[9px] font-mono text-primary font-semibold select-none">
-                    {proj.id === 'sentinel' ? "PORT: 3000" : "PORT: 3000"}
+                    <div className="flex flex-col gap-3">
+                      <a
+                        href={proj.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-gold text-xs"
+                        style={{ justifyContent: "center" }}
+                      >
+                        <Github className="w-4 h-4" /> View Repository
+                      </a>
+                      {proj.live && (
+                        <a
+                          href={proj.live}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 text-xs text-[rgba(240,236,227,0.4)] hover:text-[rgba(240,236,227,0.8)] transition-colors py-2"
+                          style={{ fontFamily: '"Outfit", sans-serif' }}
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" /> View Live Site
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </motion.div>
-            </div>
-          );
-        })}
+              </div>
+
+              {/* Bottom gold border on hover */}
+              <div className="absolute bottom-0 left-0 h-[1.5px] w-0 bg-[rgba(201,168,76,0.4)] group-hover:w-full transition-all duration-600" />
+            </motion.div>
+          ))}
+        </div>
       </div>
     </div>
   );

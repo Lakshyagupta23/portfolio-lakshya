@@ -1,601 +1,404 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Github, Linkedin, Mail, Code, Terminal, Cpu, Sparkles, ExternalLink, Bot, X, MessageSquare, ArrowUpRight, Shield, Activity, FileText } from 'lucide-react';
-import AITwin from '../components/AITwin';
+﻿import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Github, Linkedin, Mail, ArrowRight, ExternalLink } from "lucide-react";
+import AITwin from "../components/AITwin";
 
-// Advanced WebGL Tactical Radar Grid Shader
-function CyberGridBackground() {
-  const canvasRef = useRef(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    let gl;
-    try {
-      gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-    } catch (e) {
-      console.error("WebGL context creation failed:", e);
-      return;
-    }
-    if (!gl) return;
-
-    const vs = `
-      attribute vec2 a_position;
-      varying vec2 v_texCoord;
-      void main() {
-        v_texCoord = a_position * 0.5 + 0.5;
-        gl_Position = vec4(a_position, 0.0, 1.0);
-      }
-    `;
-
-    const fs = `
-      precision highp float;
-      varying vec2 v_texCoord;
-      uniform float u_time;
-      uniform vec2 u_resolution;
-
-      void main() {
-          vec2 uv = v_texCoord;
-          vec2 centered = uv - 0.5;
-          centered.x *= u_resolution.x / u_resolution.y;
-          
-          float dist = length(centered);
-          
-          // Concentric radar rings
-          float ring = fract(dist * 6.0 - u_time * 0.15);
-          float ringPattern = smoothstep(0.98, 1.0, ring) + smoothstep(0.0, 0.02, ring);
-          
-          // Rotating scanning beam
-          float angle = atan(centered.y, centered.x);
-          float sweep = fract((angle / 6.28318) + u_time * 0.05);
-          float beamPattern = smoothstep(0.95, 1.0, sweep) * (1.0 - dist * 1.5);
-          
-          // Background digital noise grid
-          vec2 grid = fract(uv * 24.0);
-          float line = smoothstep(0.0, 0.03, grid.x) + smoothstep(0.0, 0.03, grid.y);
-          float gridVal = (1.0 - line) * 0.06;
-          
-          vec3 bgColor = vec3(0.01, 0.02, 0.05); // Deeper base to let gradients pop
-          vec3 color1 = vec3(0.0, 0.95, 1.0); // Neon Cyan
-          vec3 color2 = vec3(0.45, 0.15, 1.0); // Electric Purple
-          vec3 scanColor = mix(color1, color2, sweep); // Vibrant blending beam
-          
-          vec3 finalColor = bgColor;
-          finalColor += scanColor * (ringPattern * 0.07 * (1.0 - dist * 2.0));
-          finalColor += scanColor * (beamPattern * 0.32);
-          finalColor += scanColor * gridVal;
-          
-          // Vignette
-          float vignette = smoothstep(0.9, 0.2, length(uv - 0.5));
-          finalColor *= vignette;
-          
-          gl_FragColor = vec4(finalColor, 1.0);
-      }
-    `;
-
-    const compileShader = (type, src) => {
-      const shader = gl.createShader(type);
-      gl.shaderSource(shader, src);
-      gl.compileShader(shader);
-      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        console.error("Shader compile error:", gl.getShaderInfoLog(shader));
-        gl.deleteShader(shader);
-        return null;
-      }
-      return shader;
-    };
-
-    const program = gl.createProgram();
-    const vertexShader = compileShader(gl.VERTEX_SHADER, vs);
-    const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fs);
-    if (!vertexShader || !fragmentShader) return;
-
-    gl.attachShader(program, vertexShader);
-    gl.attachShader(program, fragmentShader);
-    gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      console.error("Program link error:", gl.getProgramInfoLog(program));
-      return;
-    }
-    gl.useProgram(program);
-
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-      -1, -1,
-       1, -1,
-      -1,  1,
-       1,  1
-    ]), gl.STATIC_DRAW);
-
-    const pos = gl.getAttribLocation(program, 'a_position');
-    gl.enableVertexAttribArray(pos);
-    gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
-
-    const uTime = gl.getUniformLocation(program, 'u_time');
-    const uRes = gl.getUniformLocation(program, 'u_resolution');
-
-    let animationFrameId;
-    const resizeCanvas = () => {
-      const displayWidth = canvas.clientWidth;
-      const displayHeight = canvas.clientHeight;
-      if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
-        canvas.width = displayWidth;
-        canvas.height = displayHeight;
-      }
-    };
-
-    const render = (time) => {
-      resizeCanvas();
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      gl.uniform1f(uTime, time * 0.001);
-      gl.uniform2f(uRes, canvas.width, canvas.height);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      animationFrameId = requestAnimationFrame(render);
-    };
-
-    animationFrameId = requestAnimationFrame(render);
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-      gl.deleteBuffer(buffer);
-      gl.deleteShader(vertexShader);
-      gl.deleteShader(fragmentShader);
-      gl.deleteProgram(program);
-    };
-  }, []);
-
-  return (
-    <canvas 
-      ref={canvasRef} 
-      className="absolute inset-0 w-full h-full opacity-60 pointer-events-none" 
-      style={{ display: 'block' }} 
-    />
-  );
-}
-
-// Interactive Command Terminal Component (Cloning Face Recognition project)
-function CommandLineTerminal() {
-  const [lines, setLines] = useState([]);
-  const [inputCommand, setInputCommand] = useState('');
-  
-  const terminalScript = [
-    { type: 'input', text: 'git clone https://github.com/Lakshyagupta23/mark-my-face.git' },
-    { type: 'output', text: 'Cloning into \'mark-my-face\'...\nremote: Enumerating objects: 38, done.\nremote: Counting objects: 100% (38/38), done.\nUnpacking objects: 100% (38/38), done.' },
-    { type: 'input', text: 'cd mark-my-face && python main.py' },
-    { type: 'output', text: 'Initializing OpenCV Capture streams...\n[INFO] Loading facial database...\n[INFO] 12 facial embeddings registered successfully.\n[INFO] Camera Feed active at 30 FPS.' },
-    { type: 'json', text: {
-        status: "SUCCESS",
-        markedUser: "Lakshya Gupta",
-        action: "Attendance Logged",
-        timestamp: new Date().toLocaleTimeString(),
-        stats: {
-          confidence: "98.7%",
-          detector: "Dlib 68-Point Landmark Predictor",
-          database: "SQLite Logs"
-        }
-      }
-    }
+// Neural Network SVG Illustration
+function NeuralGraph() {
+  const nodes = [
+    { cx: 80, cy: 200, label: "ML" },
+    { cx: 80, cy: 310, label: "CV" },
+    { cx: 240, cy: 120, label: "API" },
+    { cx: 240, cy: 255, label: "AI" },
+    { cx: 240, cy: 380, label: "DB" },
+    { cx: 390, cy: 200, label: "React" },
+    { cx: 390, cy: 320, label: "Py" },
   ];
-
-  useEffect(() => {
-    let currentIdx = 0;
-    let charIdx = 0;
-    let timer;
-
-    const runScript = () => {
-      if (currentIdx >= terminalScript.length) return;
-
-      const currentStep = terminalScript[currentIdx];
-
-      if (currentStep.type === 'input') {
-        setLines(prev => {
-          if (charIdx === 0) {
-            return [...prev, { type: 'input', text: '' }];
-          }
-          const newLines = [...prev];
-          newLines[newLines.length - 1] = {
-            type: 'input',
-            text: currentStep.text.substring(0, charIdx)
-          };
-          return newLines;
-        });
-
-        if (charIdx < currentStep.text.length) {
-          charIdx++;
-          timer = setTimeout(runScript, 30);
-        } else {
-          charIdx = 0;
-          currentIdx++;
-          timer = setTimeout(runScript, 500);
-        }
-      } else {
-        setLines(prev => [...prev, currentStep]);
-        currentIdx++;
-        timer = setTimeout(runScript, 1000);
-      }
-    };
-
-    timer = setTimeout(runScript, 800);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleCustomCommandSubmit = (e) => {
-    e.preventDefault();
-    if (!inputCommand.trim()) return;
-
-    const cmd = inputCommand.toLowerCase().trim();
-    let response = `Command not recognized: "${inputCommand}". Type "help" for a list of commands.`;
-
-    if (cmd === 'help') {
-      response = 'Available commands:\n  about     - Brief summary about Lakshya\n  skills    - List core programming and AI skills\n  clear     - Clear terminal logs\n  neofetch  - Display system specifications';
-    } else if (cmd === 'about') {
-      response = 'Lakshya Gupta - AI/ML Engineer focused on OpenCV systems, LLM fine-tuning pipelines, and community leadership. Currently B.Tech student @ IPEC Ghaziabad.';
-    } else if (cmd === 'skills') {
-      response = 'Languages: Python, Go, C, C++, SQL\nSpecialties: Generative AI, Computer Vision (OpenCV), LLM fine-tuning, Model optimizations.';
-    } else if (cmd === 'neofetch') {
-      response = 'OS: LakshyaOS v1.0.0\nKernel: React 19 + Vite v7\nUptime: Live\nShell: zsh (Lakshya)\nCPU: Inderprastha Eng College B.Tech\nGPU: KVGAI Tech Limited AI Intern';
-    }
-
-    setLines(prev => [
-      ...prev,
-      { type: 'input', text: inputCommand },
-      ...(cmd === 'clear' ? [] : [{ type: 'output', text: response }])
-    ]);
-    
-    if (cmd === 'clear') {
-      setLines([]);
-    }
-    setInputCommand('');
-  };
-
+  const edges = [
+    [0,2],[0,3],[1,3],[1,4],[2,5],[3,5],[3,6],[4,6],[2,3],[3,4]
+  ];
   return (
-    <div className="w-full border border-primary/20 bg-[#070b14]/85 shadow-[0_0_25px_rgba(0,242,255,0.06)] overflow-hidden flex flex-col font-mono text-xs text-text-secondary h-[400px] clip-cyber hud-brackets">
-      <div className="hud-brackets-bottom" />
-      <div className="bg-[#0b101d] px-4 py-3 flex items-center justify-between border-b border-white/5 shrink-0 select-none">
-        <div className="flex items-center gap-1.5">
-          <span className="w-3.5 h-3.5 rounded-full bg-[#ff5f56]" />
-          <span className="w-3.5 h-3.5 rounded-full bg-[#ffbd2e]" />
-          <span className="w-3.5 h-3.5 rounded-full bg-[#27c93f]" />
-        </div>
-        <span className="text-[10px] text-primary font-semibold uppercase tracking-widest animate-pulse">BIOMETRIC_DETECTOR.SYS</span>
-        <div className="w-12" />
-      </div>
-
-      <div className="flex-1 p-4 overflow-y-auto space-y-3 no-scrollbar leading-relaxed">
-        <div className="text-text-tertiary"># Initializing AI Developer Console...</div>
-        
-        {lines.map((line, idx) => (
-          <div key={idx} className="space-y-1">
-            {line.type === 'input' && (
-              <div className="flex items-start gap-1 text-primary">
-                <span className="shrink-0 select-none">$</span>
-                <span>{line.text}</span>
-                {idx === lines.length - 1 && (
-                  <span className="inline-block w-1.5 h-3 bg-primary animate-pulse ml-0.5" />
-                )}
-              </div>
-            )}
-            
-            {line.type === 'output' && (
-              <div className="text-text-secondary whitespace-pre-wrap pl-3 border-l border-white/5">
-                {line.text}
-              </div>
-            )}
-
-            {line.type === 'json' && (
-              <pre className="text-emerald-400 pl-3 border-l border-white/5 overflow-x-auto text-[11px]">
-                {JSON.stringify(line.text, null, 2)}
-              </pre>
-            )}
-          </div>
-        ))}
-
-        <form onSubmit={handleCustomCommandSubmit} className="flex items-center gap-1 text-primary pt-2 border-t border-white/5">
-          <span className="shrink-0 select-none">$</span>
-          <input
-            type="text"
-            value={inputCommand}
-            onChange={(e) => setInputCommand(e.target.value)}
-            placeholder="Type 'help' or commands..."
-            className="flex-1 bg-transparent border-none outline-none text-text-secondary placeholder:text-text-tertiary"
-          />
-        </form>
-      </div>
-    </div>
+    <svg viewBox="0 0 480 480" className="w-full h-full" aria-hidden="true">
+      <defs>
+        <radialGradient id="nodeGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#c9a84c" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#c9a84c" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      {/* Edges */}
+      {edges.map(([a,b], i) => (
+        <motion.line
+          key={i}
+          x1={nodes[a].cx} y1={nodes[a].cy}
+          x2={nodes[b].cx} y2={nodes[b].cy}
+          stroke="rgba(201,168,76,0.18)"
+          strokeWidth="1"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: 1 }}
+          transition={{ duration: 1.2, delay: 0.5 + i * 0.08, ease: "easeOut" }}
+        />
+      ))}
+      {/* Glow halos */}
+      {nodes.map((n, i) => (
+        <motion.circle
+          key={"halo-" + i}
+          cx={n.cx} cy={n.cy} r="26"
+          fill="url(#nodeGrad)"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.2 + i * 0.1 }}
+        />
+      ))}
+      {/* Nodes */}
+      {nodes.map((n, i) => (
+        <motion.g
+          key={"node-" + i}
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 1 + i * 0.1, ease: [0.16,1,0.3,1] }}
+        >
+          <circle cx={n.cx} cy={n.cy} r="18" fill="#161412" stroke="rgba(201,168,76,0.35)" strokeWidth="1" />
+          <text x={n.cx} y={n.cy + 4} textAnchor="middle" fill="#c9a84c" fontSize="8" fontFamily="JetBrains Mono, monospace" fontWeight="700">
+            {n.label}
+          </text>
+        </motion.g>
+      ))}
+      {/* Animated pulse ring on center node */}
+      <motion.circle
+        cx={240} cy={255} r="24"
+        fill="none"
+        stroke="rgba(201,168,76,0.5)"
+        strokeWidth="1"
+        animate={{ r: [24, 38, 24], opacity: [0.5, 0, 0.5] }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+      />
+    </svg>
   );
 }
+
+const words = ["Developer", "AI/ML Engineer", "Builder", "Problem Solver"];
 
 export default function Home() {
-  const [showFloatingChat, setShowFloatingChat] = useState(false);
+  const [wordIdx, setWordIdx] = useState(0);
+  const [displayWord, setDisplayWord] = useState(words[0]);
+  const [chatOpen, setChatOpen] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setWordIdx((prev) => {
+        const next = (prev + 1) % words.length;
+        setDisplayWord(words[next]);
+        return next;
+      });
+    }, 2800);
+    return () => clearInterval(interval);
+  }, []);
+
+  const fadeUp = (delay = 0) => ({
+    initial: { opacity: 0, y: 30 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] },
+  });
 
   return (
-    <div className="relative min-h-screen w-full bg-transparent overflow-x-hidden pt-12 pb-20">
-      {/* Visual Overlay Sweeps */}
-      <div className="scanlines-overlay" />
-      <div className="screen-sweep" />
+    <div className="relative min-h-screen w-full">
+      {/* ── HERO ─────────────────────────────────────────────────── */}
+      <section className="relative flex min-h-screen items-center px-6 pt-24 pb-16 md:px-12 lg:px-20">
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
-      {/* WebGL concentric radar background */}
-      <div className="absolute inset-0 z-0">
-        <CyberGridBackground />
-      </div>
+            {/* Left: Text */}
+            <div className="space-y-8">
+              <motion.div {...fadeUp(0.1)}>
+                <span className="label-tag">Available for Work · 2026</span>
+              </motion.div>
 
-      {/* HUD Border Lines */}
-      <div className="cyber-line-v left-[10%] hidden md:block"></div>
-      <div className="cyber-line-v left-[90%] hidden md:block"></div>
-      <div className="cyber-line-h top-[25%] hidden md:block"></div>
-      <div className="cyber-line-h top-[75%] hidden md:block"></div>
+              <div className="space-y-4">
+                <motion.h1
+                  className="font-display font-extrabold leading-none tracking-tighter text-[#f0ece3]"
+                  style={{ fontSize: "clamp(50px, 7vw, 90px)", fontFamily: '"Sora", sans-serif' }}
+                  {...fadeUp(0.2)}
+                >
+                  LAKSHYA<br />GUPTA
+                </motion.h1>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-12 lg:px-16 pt-16">
-        
-        {/* HERO SECTION */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-24">
-          
-          <div className="lg:col-span-6 space-y-6">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-xs font-mono text-primary animate-pulse"
-            >
-              <Activity className="w-3.5 h-3.5 text-primary" />
-              <span>KVGAI Tech Limited · AI/ML Developer</span>
-            </motion.div>
+                <motion.div {...fadeUp(0.3)} className="flex items-center gap-3">
+                  <div className="h-px w-8 bg-[#c9a84c] animate-line-grow" />
+                  <span
+                    className="text-[#c9a84c] text-base font-medium tracking-wide"
+                    style={{ fontFamily: '"Outfit", sans-serif' }}
+                  >
+                    <motion.span
+                      key={displayWord}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      {displayWord}
+                    </motion.span>
+                  </span>
+                </motion.div>
+              </div>
 
-            <div className="space-y-3">
-              <motion.h1 
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="text-4xl sm:text-5xl lg:text-6xl font-bold font-display text-white tracking-tighter leading-tight glitch-text cursor-default"
-                data-text="LAKSHYA GUPTA"
+              <motion.p
+                {...fadeUp(0.4)}
+                className="text-[rgba(240,236,227,0.6)] text-base leading-relaxed max-w-md"
+                style={{ fontFamily: '"Outfit", sans-serif' }}
               >
-                LAKSHYA GUPTA
-              </motion.h1>
-              
-              <motion.p 
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-sm font-mono text-primary/80 uppercase tracking-widest"
-              >
-                AI & Machine Learning Scholar · Developer
+                B.Tech AI/ML student at IPEC, Ghaziabad. Building real-world products at the intersection of machine learning, computer vision, and modern web engineering.
               </motion.p>
+
+              <motion.div {...fadeUp(0.5)} className="flex flex-wrap gap-3">
+                <Link to="/projects" className="btn-gold">
+                  View Projects <ArrowRight className="w-4 h-4" />
+                </Link>
+                <button
+                  id="open-ai-twin-btn"
+                  onClick={() => setChatOpen(true)}
+                  className="inline-flex items-center gap-2 text-sm font-medium text-[rgba(240,236,227,0.55)] hover:text-[rgba(240,236,227,0.9)] transition-colors duration-200 cursor-pointer"
+                  style={{ fontFamily: '"Outfit", sans-serif' }}
+                >
+                  Chat with my AI Twin <ArrowRight className="w-4 h-4" />
+                </button>
+              </motion.div>
+
+              <motion.div {...fadeUp(0.6)} className="flex items-center gap-5 pt-2">
+                <a href="https://github.com/Lakshyagupta23" target="_blank" rel="noopener noreferrer" aria-label="GitHub"
+                  className="text-[rgba(240,236,227,0.4)] hover:text-[rgba(240,236,227,0.9)] transition-colors duration-200">
+                  <Github className="w-5 h-5" />
+                </a>
+                <a href="https://linkedin.com/in/lakshya-gupta-822770301" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"
+                  className="text-[rgba(240,236,227,0.4)] hover:text-[rgba(240,236,227,0.9)] transition-colors duration-200">
+                  <Linkedin className="w-5 h-5" />
+                </a>
+                <a href="mailto:lakshyagupta23.lg@gmail.com" aria-label="Email"
+                  className="text-[rgba(240,236,227,0.4)] hover:text-[rgba(240,236,227,0.9)] transition-colors duration-200">
+                  <Mail className="w-5 h-5" />
+                </a>
+                <a href="/resumes/Lakshya_Resume.pdf" target="_blank" rel="noopener noreferrer"
+                  className="label-tag hover:border-[rgba(201,168,76,0.5)] transition-colors duration-200">
+                  View Resume
+                </a>
+              </motion.div>
             </div>
 
-            <motion.p 
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-xs sm:text-sm text-text-secondary leading-relaxed max-w-lg"
-            >
-              I am an AI/ML developer specializing in OpenCV computer vision models, fine-tuning large language models, and core system architectures. Currently serving as the Social Media Lead of HackSphere and Event Head of THINK AI.
-            </motion.p>
-
-            <motion.div 
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex flex-wrap gap-4 pt-2"
-            >
-              <Link
-                to="/projects"
-                className="rounded-lg bg-gradient-to-r from-primary to-secondary px-5 py-2.5 text-xs font-semibold text-black hover:brightness-110 active:scale-98 transition-all shadow-[0_0_20px_rgba(0,242,255,0.2)] cursor-pointer flex items-center gap-1.5 clip-cyber-btn"
-              >
-                <span>Explore Projects</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
-              </Link>
-              
-              <button
-                onClick={() => setShowFloatingChat(true)}
-                className="rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 px-5 py-2.5 text-xs font-semibold text-primary hover:text-white active:scale-98 transition-all cursor-pointer flex items-center gap-2 clip-cyber-btn"
-              >
-                <Bot className="w-4 h-4 text-primary animate-bounce" />
-                <span>Interact AI Twin</span>
-              </button>
-
-              <a
-                href="/resumes/Lakshya_Gupta_Resume.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-lg border border-secondary/20 bg-secondary/5 hover:bg-secondary/10 px-5 py-2.5 text-xs font-semibold text-secondary hover:text-white active:scale-98 transition-all cursor-pointer flex items-center gap-2 clip-cyber-btn"
-              >
-                <FileText className="w-4 h-4 text-secondary" />
-                <span>View Resume</span>
-              </a>
-            </motion.div>
-
-            {/* Social Connect */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="flex items-center gap-5 border-t border-white/5 pt-6"
-            >
-              <span className="text-[10px] font-mono text-text-tertiary uppercase tracking-wider">Connect:</span>
-              
-              <a
-                href="https://github.com/Lakshyagupta23"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-text-secondary hover:text-white hover:scale-110 transition-all"
-                title="GitHub"
-              >
-                <Github className="w-4.5 h-4.5" />
-              </a>
-              <a
-                href="https://linkedin.com/in/lakshya-gupta-822770301"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-text-secondary hover:text-white hover:scale-110 transition-all"
-                title="LinkedIn"
-              >
-                <Linkedin className="w-4.5 h-4.5" />
-              </a>
-              <a
-                href="mailto:lakshyagupta23.lg@gmail.com"
-                className="text-text-secondary hover:text-white hover:scale-110 transition-all"
-                title="Email"
-              >
-                <Mail className="w-4.5 h-4.5" />
-              </a>
-            </motion.div>
-
-            {/* Tech Stack Overview */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.55 }}
-              className="flex flex-wrap gap-2 pt-4"
-            >
-              {["Python", "FastAPI", "Next.js", "React", "TypeScript", "scikit-learn", "OpenCV", "MySQL", "tRPC"].map(tech => (
-                <span key={tech} className="text-[10px] font-mono px-2.5 py-0.5 rounded bg-white/[0.02] border border-white/5 text-text-secondary hover:text-white hover:border-primary/25 transition-all">
-                  {tech}
-                </span>
-              ))}
-            </motion.div>
-          </div>
-
-          <div className="lg:col-span-6 w-full">
+            {/* Right: Neural Graph */}
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-full max-w-md mx-auto aspect-square"
             >
-              <CommandLineTerminal />
+              {/* Outer ring */}
+              <div className="absolute inset-0 rounded-full border border-[rgba(201,168,76,0.06)]" />
+              <div className="absolute inset-8 rounded-full border border-[rgba(201,168,76,0.04)]" />
+              <NeuralGraph />
             </motion.div>
           </div>
 
-        </div>
-
-        {/* PROJECTS SECTION */}
-        <section className="space-y-8 pt-12 border-t border-white/5">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <h2 className="text-xl sm:text-2xl font-bold font-display text-white tracking-tight flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary" />
-                <span>Featured Systems</span>
-              </h2>
-              <p className="text-[11px] font-mono text-text-tertiary">PROTOTYPES_DEVELOPED.SYS</p>
+          {/* Scroll indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5, duration: 0.8 }}
+            className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
+          >
+            <div className="w-[1px] h-10 bg-[rgba(240,236,227,0.1)] relative overflow-hidden">
+              <div className="absolute inset-x-0 top-0 h-4 bg-[rgba(201,168,76,0.6)] animate-scroll-dot" />
             </div>
-            <Link to="/projects" className="text-xs text-primary hover:underline flex items-center gap-1 font-mono">
-              <span>View All</span>
-              <ExternalLink className="w-3 h-3" />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── STATS ROW ─────────────────────────────────────────────── */}
+      <section className="border-y border-[rgba(240,236,227,0.06)] px-6 py-8 md:px-12 lg:px-20">
+        <div className="mx-auto max-w-7xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-0 divide-y sm:divide-y-0 sm:divide-x divide-[rgba(240,236,227,0.08)]"
+          >
+            {[
+              { val: "2+", label: "Projects Live" },
+              { val: "1st", label: "Place Hackathon · JECRC" },
+              { val: "AI/ML", label: "Intern @ KVGAI Tech" },
+              { val: "SIH", label: "2025 Participant" },
+            ].map((s, i) => (
+              <div key={i} className="flex flex-col items-center py-4 px-10 gap-1 text-center">
+                <span
+                  className="text-xl font-bold text-[#c9a84c]"
+                  style={{ fontFamily: '"Sora", sans-serif' }}
+                >
+                  {s.val}
+                </span>
+                <span
+                  className="text-xs text-[rgba(240,236,227,0.4)] tracking-wide uppercase"
+                  style={{ fontFamily: '"Outfit", sans-serif' }}
+                >
+                  {s.label}
+                </span>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── FEATURED PROJECTS STRIP ───────────────────────────────── */}
+      <section className="px-6 pt-20 pb-24 md:px-12 lg:px-20">
+        <div className="mx-auto max-w-7xl">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="flex items-center justify-between mb-10"
+          >
+            <div className="flex items-center gap-4">
+              <div className="h-px w-6 bg-[rgba(201,168,76,0.4)]" />
+              <span className="label-tag">Featured Work</span>
+            </div>
+            <Link
+              to="/projects"
+              className="text-xs text-[rgba(240,236,227,0.4)] hover:text-[rgba(240,236,227,0.8)] transition-colors flex items-center gap-1"
+              style={{ fontFamily: '"Outfit", sans-serif' }}
+            >
+              All Projects <ArrowRight className="w-3 h-3" />
             </Link>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            {/* SentinelFlow */}
-            <div className="glass-panel group p-1.5 rounded-xl transition-all duration-300 hover:scale-[1.01] hover:border-primary/20 hover:shadow-[0_0_30px_rgba(0,242,255,0.12)] clip-cyber hud-brackets">
-              <div className="hud-brackets-bottom" />
-              <div className="relative overflow-hidden rounded-lg bg-surface-container/20">
-                <div className="aspect-video w-full bg-slate-950 flex items-center justify-center overflow-hidden relative">
-                  <img 
-                    className="w-full h-full object-cover opacity-40 group-hover:scale-[1.03] transition-transform duration-500" 
-                    src="/images/sentinelflow.png"
-                    alt="SentinelFlow Dashboard"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/40 to-transparent"></div>
-                  
-                  {/* Radar/Scanning target lines overlay */}
-                  <div className="absolute inset-0 border border-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none flex items-center justify-center">
-                    <div className="w-16 h-16 border border-dashed border-primary/40 rounded-full animate-spin" />
-                  </div>
-                </div>
-                
-                <div className="absolute bottom-6 left-6 right-6">
-                  <div className="flex gap-2 mb-3">
-                    <span className="px-2 py-1 bg-primary/10 border border-primary/20 text-[9px] font-mono text-primary rounded">SECURITY / ML</span>
-                    <span className="px-2 py-1 bg-white/5 text-[9px] font-mono text-text-secondary rounded">SCIKIT-LEARN / TRPC</span>
-                  </div>
-                  <h3 className="text-lg font-semibold font-display text-white mb-1.5">SentinelFlow</h3>
-                  <p className="text-xs text-text-secondary line-clamp-2 leading-relaxed">
-                    Real-time DDoS threat mitigation platform powered by an Isolation Forest anomaly model and live traffic telemetry.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* RogueDex */}
-            <div className="glass-panel group p-1.5 rounded-xl transition-all duration-300 hover:scale-[1.01] hover:border-primary/20 hover:shadow-[0_0_30px_rgba(0,242,255,0.12)] clip-cyber hud-brackets">
-              <div className="hud-brackets-bottom" />
-              <div className="relative overflow-hidden rounded-lg bg-surface-container/20">
-                <div className="aspect-video w-full bg-slate-950 flex items-center justify-center overflow-hidden relative">
-                  <img 
-                    className="w-full h-full object-cover opacity-40 group-hover:scale-[1.03] transition-transform duration-500" 
-                    src="/images/roguedex.png"
-                    alt="RogueDex Dashboard"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/40 to-transparent"></div>
-                  
-                  {/* Sweep line on hover */}
-                  <div className="absolute top-0 bottom-0 left-0 right-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent -translate-x-full group-hover:animate-marquee pointer-events-none" />
-                </div>
-                
-                <div className="absolute bottom-6 left-6 right-6">
-                  <div className="flex gap-2 mb-3">
-                    <span className="px-2 py-1 bg-secondary/10 border border-secondary/20 text-[9px] font-mono text-secondary rounded">GAMING APP</span>
-                    <span className="px-2 py-1 bg-white/5 text-[9px] font-mono text-text-secondary rounded">NEXT.JS / POKEAPI</span>
-                  </div>
-                  <h3 className="text-lg font-semibold font-display text-white mb-1.5">RogueDex</h3>
-                  <p className="text-xs text-text-secondary line-clamp-2 leading-relaxed">
-                    Polished Pokémon randomizer team builder and information hub featuring holographic cards and custom filters.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-      </div>
-
-      {/* FLOATING CHAT BUTTON & MODAL WIDGET */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
-        <AnimatePresence>
-          {showFloatingChat && (
-            <motion.div
-              initial={{ opacity: 0, y: 30, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 30, scale: 0.95 }}
-              className="w-[360px] sm:w-[420px] h-[520px] rounded-xl border border-primary/20 bg-[#070b14]/95 shadow-2xl overflow-hidden mb-4 flex flex-col clip-cyber hud-brackets"
-            >
-              <div className="hud-brackets-bottom" />
-              <div className="bg-[#0b101d] px-4 py-3 flex items-center justify-between border-b border-white/5 shrink-0 select-none">
-                <div className="flex items-center gap-2">
-                  <Bot className="w-4.5 h-4.5 text-primary animate-pulse" />
-                  <span className="text-xs font-semibold text-primary font-display tracking-widest uppercase">AI TWIN INTERACTION [BETA]</span>
-                </div>
-                <button 
-                  onClick={() => setShowFloatingChat(false)}
-                  className="text-text-secondary hover:text-white transition-colors cursor-pointer"
+            {[
+              {
+                num: "01",
+                title: "SentinelFlow",
+                cat: "Cybersecurity · ML",
+                desc: "Real-time DDoS detection and mitigation platform. scikit-learn Isolation Forest + FastAPI + React.",
+                live: "https://sentinelflow-web-server.onrender.com/",
+                gh: "https://github.com/Lakshyagupta23/Sentinelflow-DDOS",
+                tech: ["React", "FastAPI", "scikit-learn", "MySQL"],
+              },
+              {
+                num: "02",
+                title: "RogueDex",
+                cat: "Web Application",
+                desc: "Pokémon randomizer and team builder with advanced filters and holographic card design.",
+                live: "https://rogue-dex.vercel.app/",
+                gh: "https://github.com/Lakshyagupta23/RogueDex",
+                tech: ["Next.js", "TypeScript", "PokeAPI"],
+              },
+            ].map((proj, i) => (
+              <motion.div
+                key={proj.num}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.12 }}
+                className="card-surface rounded-[3px] p-8 group relative overflow-hidden"
+              >
+                {/* Large project number watermark */}
+                <span
+                  className="absolute top-4 right-6 text-7xl font-bold text-[rgba(201,168,76,0.04)] pointer-events-none select-none"
+                  style={{ fontFamily: '"Sora", sans-serif' }}
                 >
-                  <X className="w-4.5 h-4.5" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-hidden relative">
-                <AITwin />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                  {proj.num}
+                </span>
 
-        <motion.button
-          onClick={() => setShowFloatingChat(!showFloatingChat)}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-black shadow-lg hover:shadow-[0_0_20px_rgba(0,242,255,0.4)] transition-all cursor-pointer relative"
+                <div className="relative z-10 space-y-4">
+                  <div>
+                    <p className="text-[10px] font-mono text-[rgba(201,168,76,0.7)] uppercase tracking-widest mb-1" style={{ fontFamily: '"JetBrains Mono", monospace' }}>
+                      {proj.cat}
+                    </p>
+                    <h3 className="text-2xl font-bold text-[#f0ece3]" style={{ fontFamily: '"Sora", sans-serif' }}>
+                      {proj.title}
+                    </h3>
+                  </div>
+
+                  <p className="text-sm text-[rgba(240,236,227,0.55)] leading-relaxed" style={{ fontFamily: '"Outfit", sans-serif' }}>
+                    {proj.desc}
+                  </p>
+
+                  <div className="flex flex-wrap gap-1.5">
+                    {proj.tech.map((t) => (
+                      <span key={t} className="tech-pill">{t}</span>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-4 pt-2 border-t border-[rgba(240,236,227,0.05)]">
+                    <a
+                      href={proj.live}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs text-[rgba(201,168,76,0.8)] hover:text-[#c9a84c] transition-colors font-medium"
+                      style={{ fontFamily: '"Outfit", sans-serif' }}
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" /> Live Site
+                    </a>
+                    <a
+                      href={proj.gh}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs text-[rgba(240,236,227,0.4)] hover:text-[rgba(240,236,227,0.8)] transition-colors"
+                      style={{ fontFamily: '"Outfit", sans-serif' }}
+                    >
+                      <Github className="w-3.5 h-3.5" /> Repository
+                    </a>
+                  </div>
+                </div>
+
+                {/* Bottom gold border on hover */}
+                <div className="absolute bottom-0 left-0 h-[1.5px] w-0 bg-[rgba(201,168,76,0.5)] group-hover:w-full transition-all duration-500" />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── AI TWIN FLOATING BUTTON ──────────────────────────────── */}
+      <motion.button
+        id="ai-twin-float-btn"
+        onClick={() => setChatOpen(true)}
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 2, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        whileHover={{ scale: 1.08 }}
+        className="fixed bottom-7 right-7 z-30 flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(201,168,76,0.4)] bg-[#161412] shadow-xl cursor-pointer group"
+        aria-label="Open AI Twin chat"
+      >
+        <span className="text-lg" aria-hidden="true" style={{ fontFamily: '"Sora", sans-serif', fontWeight: 800, color: "#c9a84c" }}>AI</span>
+        <div className="absolute inset-0 rounded-full border border-[rgba(201,168,76,0.15)] animate-live-glow pointer-events-none" />
+      </motion.button>
+
+      {/* ── AI TWIN MODAL ────────────────────────────────────────── */}
+      {chatOpen && (
+        <motion.div
+          id="ai-twin-modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-[rgba(14,12,10,0.8)] backdrop-blur-sm"
+          onClick={(e) => { if (e.target === e.currentTarget) setChatOpen(false); }}
         >
-          {showFloatingChat ? <X className="w-5.5 h-5.5" /> : <MessageSquare className="w-5.5 h-5.5" />}
-          
-          {/* Pulsing indicator ring */}
-          <span className="absolute inset-0 rounded-full border border-primary animate-ping opacity-25" />
-        </motion.button>
-      </div>
-
+          <motion.div
+            initial={{ scale: 0.9, y: 40, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="relative w-full max-w-2xl h-[85vh] max-h-[720px] flex flex-col"
+          >
+            <button
+              onClick={() => setChatOpen(false)}
+              className="absolute -top-10 right-0 text-xs text-[rgba(240,236,227,0.4)] hover:text-[rgba(240,236,227,0.9)] transition-colors cursor-pointer flex items-center gap-1"
+              style={{ fontFamily: '"Outfit", sans-serif' }}
+            >
+              Close
+            </button>
+            <AITwin />
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }
