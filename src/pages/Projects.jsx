@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { Github, ExternalLink } from "lucide-react";
 
@@ -57,7 +57,7 @@ const projects = [
     title: "Eventure",
     subtitle: "Verified College Events Sponsorship Platform",
     category: "Full-Stack · Hackathon Winner",
-    description: "A dual-key verified sponsorship marketplace connecting student event organisers with corporate sponsors. Won 1st place at JECRC Bid2Code Hackathon (2024). Implements a signed contract verification system to eliminate false sponsorship agreements common on informal channels.",
+    description: "A dual-key verified sponsorship marketplace connecting student event organisers with corporate sponsors. Won 1st place at JECRC Bid2Code Hackathon (Sep 2025). Implements a signed contract verification system to eliminate false sponsorship agreements common on informal channels.",
     bullets: [
       "Dual-key verification flow: both parties must sign off for a sponsorship contract to activate",
       "Corporate and event-host profile dashboards with deal tracking and status management",

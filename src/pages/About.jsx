@@ -30,7 +30,7 @@ const timeline = [
     detail: "Built Mark My Face — a real-time face recognition attendance system using OpenCV and Dlib (Team VISIONEERS).",
   },
   {
-    year: "2024",
+    year: "Sep 2025",
     title: "1st Place · JECRC Hackathon",
     place: "Bid2Code, Jaipur",
     detail: "Won with Eventure — a verified college sponsorship platform built on Node.js, Express, and SQL.",
