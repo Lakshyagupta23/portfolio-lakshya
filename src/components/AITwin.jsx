@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp, Copy, Check, RefreshCw, Settings, Eye, EyeOff, X, Wifi, WifiOff } from "lucide-react";
 
@@ -218,12 +218,12 @@ export default function AITwin({ compact = false }) {
             {isLive && activeKey ? "Gemini Live" : "Offline DB"}
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button onClick={resetChat} className="text-[rgba(240,236,227,0.3)] hover:text-[rgba(240,236,227,0.8)] transition-colors cursor-pointer" title="Reset chat">
-            <RefreshCw className="w-3.5 h-3.5" />
+        <div className="flex items-center gap-2 relative z-50">
+          <button type="button" onClick={resetChat} className="p-2 -mr-2 text-[rgba(240,236,227,0.3)] hover:text-[rgba(240,236,227,0.8)] transition-colors cursor-pointer" title="Reset chat">
+            <RefreshCw className="w-4 h-4" />
           </button>
-          <button onClick={() => setShowSettings((p) => !p)} className="text-[rgba(240,236,227,0.3)] hover:text-[rgba(240,236,227,0.8)] transition-colors cursor-pointer" title="Settings">
-            <Settings className="w-3.5 h-3.5" />
+          <button type="button" onClick={() => setShowSettings((p) => !p)} className="p-2 -mr-2 text-[rgba(240,236,227,0.3)] hover:text-[rgba(240,236,227,0.8)] transition-colors cursor-pointer" title="Settings">
+            <Settings className="w-4 h-4" />
           </button>
         </div>
       </div>

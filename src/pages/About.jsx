@@ -1,13 +1,12 @@
-﻿import React from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { Github, Linkedin, Mail } from "lucide-react";
 
 const skills = [
   { cat: "Languages", items: ["Python", "C", "C++", "SQL"] },
   { cat: "AI / ML", items: ["Machine Learning", "Generative AI", "Model Fine-Tuning", "Prompt Engineering", "Data Analysis"] },
-  { cat: "Computer Vision", items: ["OpenCV", "Dlib", "MediaPipe", "Face Recognition"] },
-  { cat: "Web Development", items: ["React", "Next.js", "Node.js", "Express", "FastAPI", "TypeScript"] },
-  { cat: "Databases & ORM", items: ["MySQL", "SQLite", "TiDB", "Drizzle ORM"] },
+  { cat: "Web Development", items: ["React", "Next.js", "Express", "FastAPI", "TypeScript"] },
+  { cat: "Databases & ORM", items: ["MySQL", "TiDB", "Drizzle ORM"] },
   { cat: "Core CS", items: ["Data Structures", "Algorithms", "OOP", "DBMS"] },
 ];
 
